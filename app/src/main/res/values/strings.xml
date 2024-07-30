@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sudoku</string>
+    <string name="starting_button">Кликай</string>
+    <string name="second_page">It is 2 page</string>
+    <string name="_3x3">3x3</string>
+    <string name="_4x4">4x4</string>
+    <string name="_5x5">5x5</string>
+    <string name="textBlockSize">Выберете размер блока</string>
+    <string name="textHard">Сложная</string>
+    <string name="textMedium">Средняя</string>
+    <string name="textEasy">Легкая</string>
+    <string name="textGenerateNewBoard">Сгенерировать новое поле</string>
+</resources>
