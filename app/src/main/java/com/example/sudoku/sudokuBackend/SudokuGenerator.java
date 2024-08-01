@@ -21,9 +21,9 @@ public class SudokuGenerator {
         mSquareSize = (int) Math.sqrt(mBoardSize);
         mBoard = board;
         difficulty = diff;
-        difficult.put("easy", 35 + new Random().nextInt(45));
-        difficult.put("medium", 25 + new Random().nextInt(35));
-        difficult.put("hard", 15 + new Random().nextInt(25));
+        difficult.put("easy", 20 + new Random().nextInt(5));
+        difficult.put("medium", 25 + new Random().nextInt(5));
+        difficult.put("hard", 30 + new Random().nextInt(5));
     }
 
     public SudokuGenerator(int[][] board) {
@@ -168,7 +168,7 @@ public class SudokuGenerator {
     }
 
     public int getNumberTasks() {
-        return mBoardSize * mBoardSize - difficult.get(difficulty);
+        return difficult.get(difficulty);
     }
 
     public int[][] deleteElements() {

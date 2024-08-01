@@ -56,9 +56,8 @@ public class SudokuSolver {
             if (isValid(i, j, value)) {
                 mBoard[i][j] = value;
                 setSubsetValue(i, j, value - 1, true);
-                if (solve(i + 1, j)) {
+                if (solve(i + 1, j))
                     return true;
-                }
                 setSubsetValue(i, j, value - 1, false);
             }
         }
