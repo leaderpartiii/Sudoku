@@ -15,12 +15,13 @@ import androidx.core.content.ContextCompat;
 
 import com.example.sudoku.layout.SquareGridLayout;
 import com.example.sudoku.sudokuBackend.SudokuGenerator;
+import com.example.sudoku.sudokuBackend.SudokuGeneratorSimple;
+import com.example.sudoku.sudokuBackend.SudokuTemplate;
 
-import org.w3c.dom.Text;
 
 public class SudokuActivity extends AppCompatActivity {
-    private int GRID_SIZE = 9;
-    private int SQUARE_GRID_SIZE = 3;
+    private int GRID_SIZE;
+    private int SQUARE_GRID_SIZE;
     private int SELECTED_NUMBER;
     private int COUNT_MISTAKES;
     private int COUNT_TASKS = 0;
@@ -34,14 +35,28 @@ public class SudokuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sudoku);
 
-        Button resetButton = findViewById(R.id.buttonReset);
-        resetButton.setOnClickListener(view -> generateBoard());
-
         DIFFICULT = getIntent().getStringExtra("DIFFICULT");
         GRID_SIZE = getIntent().getIntExtra("BOARD_SIZE", 9);
         SQUARE_GRID_SIZE = (int) Math.sqrt(GRID_SIZE);
 
+        generateButtonReset();
         generateBoard();
+    }
+
+    private void generateButtonReset() {
+        Button resetButton = findViewById(R.id.buttonReset);
+        resetButton.setOnClickListener(view -> {
+            resetButton();
+            generateBoard();
+        });
+    }
+
+    private void resetButton() {
+        SquareGridLayout gridLayout = findViewById(R.id.square_grid_layout);
+        LinearLayout linearLayout = findViewById(R.id.numberBar);
+
+        gridLayout.removeAllViews();
+        linearLayout.removeAllViews();
     }
 
     private void generateBoard() {
@@ -50,7 +65,13 @@ public class SudokuActivity extends AppCompatActivity {
     }
 
     public void createTable() {
-        SudokuGenerator sudokuDecision = new SudokuGenerator(SQUARE_GRID_SIZE, DIFFICULT);
+        SudokuTemplate sudokuDecision;
+        if (SQUARE_GRID_SIZE == 3) {
+            sudokuDecision = new SudokuGenerator(SQUARE_GRID_SIZE, DIFFICULT);
+        } else {
+            sudokuDecision = new SudokuGeneratorSimple(SQUARE_GRID_SIZE, DIFFICULT);
+            sudokuDecision.getShuffle();
+        }
 
         COUNT_TASKS = sudokuDecision.getNumberTasks();
         COUNT_MISTAKES = 3;
@@ -59,6 +80,7 @@ public class SudokuActivity extends AppCompatActivity {
         NUMBERS_ON_NUMBER_BAR = new int[GRID_SIZE];
 
         SquareGridLayout grid_layout = findViewById(R.id.square_grid_layout);
+
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
 
             int row = i % GRID_SIZE, col = i / GRID_SIZE;
@@ -71,27 +93,28 @@ public class SudokuActivity extends AppCompatActivity {
             TextView cell = new TextView(this);
             cell.setGravity(Gravity.CENTER);
             cell.setBackgroundResource(android.R.color.background_light);
-            cell.setTextSize(18);
+            cell.setTextSize(getPixels());
             cell.setText(numProblemBoard == 0 ? "-" : String.valueOf(numProblemBoard));
 
             int finalI = i;
-            cell.setOnClickListener(v -> showMessage(numDecisionBoard, finalI));
             defaultColor = cell.getCurrentTextColor();
+            cell.setOnClickListener(v -> showMessage(numDecisionBoard, finalI));
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = 0;
             params.rowSpec = GridLayout.spec(col, 1, 1f);
             params.columnSpec = GridLayout.spec(row, 1, 1f);
-            if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1) {
-                params.setMargins(5, 5, 15, 15);
-            } else if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1) {
-                params.setMargins(5, 5, 15, 5);
-            } else if (row % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1) {
-                params.setMargins(5, 5, 5, 15);
-            } else {
-                params.setMargins(5, 5, 5, 5);
-            }
 
+            int norm = 5;
+            int space = 15;
+            if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1)
+                params.setMargins(norm, norm, space, space);
+            else if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1)
+                params.setMargins(norm, norm, space, norm);
+            else if (row % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1)
+                params.setMargins(norm, norm, norm, space);
+            else
+                params.setMargins(norm, norm, norm, norm);
             grid_layout.addView(cell, params);
         }
     }
@@ -99,6 +122,7 @@ public class SudokuActivity extends AppCompatActivity {
     public void showMessage(int number, int index) {
         SquareGridLayout layout = findViewById(R.id.square_grid_layout);
         TextView text = (TextView) layout.getChildAt(index);
+
         if (!text.getText().toString().equals("-") && text.getCurrentTextColor() != ContextCompat.getColor(this, R.color.red)) {
             highLight(text);
             return;
@@ -122,7 +146,6 @@ public class SudokuActivity extends AppCompatActivity {
                 dialog.show();
             }
         } else {
-
             text.setText(String.valueOf(SELECTED_NUMBER));
             text.setTextColor(getResources().getColor(R.color.red));
 
@@ -146,6 +169,7 @@ public class SudokuActivity extends AppCompatActivity {
         });
 
         builder.setNegativeButton("Перегенерировать поле", (dialog, which) -> {
+            resetButton();
             generateBoard();
             finish();
         });
@@ -164,10 +188,9 @@ public class SudokuActivity extends AppCompatActivity {
     }
 
     private void highLight(TextView numberButton) {
-        int oldSelectedNumber;
-        oldSelectedNumber = SELECTED_NUMBER;
-        SELECTED_NUMBER = Integer.parseInt(numberButton.getText().toString());
+        int oldSelectedNumber = SELECTED_NUMBER;
         SquareGridLayout squareGridLayout = findViewById(R.id.square_grid_layout);
+        SELECTED_NUMBER = Integer.parseInt(numberButton.getText().toString());
         if (SELECTED_NUMBER == oldSelectedNumber) {
             highLightCell(squareGridLayout, android.R.color.background_light, numberButton.getText().toString());
             SELECTED_NUMBER = -1;
@@ -178,25 +201,34 @@ public class SudokuActivity extends AppCompatActivity {
         highLightCell(squareGridLayout, R.color.light_gray, numberButton.getText().toString());
     }
 
+    private int getPixels() {
+        switch (GRID_SIZE) {
+            case (9):
+                return 18;
+            case (16):
+                return 8;
+            case (25):
+                return 4;
+            default:
+                return 0;
+        }
+    }
+
     public void createNumberBar() {
-
         LinearLayout numberButtonsLayout = findViewById(R.id.numberBar);
-
-
         for (int i = 0; i < GRID_SIZE; i++) {
             Button numberButton = new Button(this);
-            if (NUMBERS_ON_NUMBER_BAR[i] != GRID_SIZE) {
+            if (NUMBERS_ON_NUMBER_BAR[i] != GRID_SIZE)
                 numberButton.setText(String.valueOf(i + 1));
-            }
+            numberButton.setTextSize(getPixels());
+            numberButton.setPadding(10, 20, 10, 20);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+
             numberButton.setLayoutParams(params);
-
             numberButton.setOnClickListener(v -> highLight(numberButton));
-
             numberButtonsLayout.addView(numberButton);
         }
-
     }
 
 }

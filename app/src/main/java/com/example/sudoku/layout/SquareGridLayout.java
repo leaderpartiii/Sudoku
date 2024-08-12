@@ -18,10 +18,10 @@ public class SquareGridLayout extends GridLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @Override
-    protected void onMeasure(int widthSpec, int heightSpec) {
-        super.onMeasure(widthSpec, heightSpec);
-        int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-        setMeasuredDimension(size, size);
-    }
+//    @Override
+//    protected void onMeasure(int widthSpec, int heightSpec) {
+//        super.onMeasure(widthSpec, heightSpec);
+//        int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+//        setMeasuredDimension(size, size);
+//    }
 }

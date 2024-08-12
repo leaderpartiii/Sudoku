@@ -77,5 +77,20 @@ public class SudokuSolver {
         int boxCol = j / mBoxSize;
         return boxRow * mBoxSize + boxCol;
     }
+    public static String getString(int mBoardSize, int[][] mBoard) {
+        StringBuilder res = new StringBuilder();
+        int squareSize = (int)Math.sqrt(mBoardSize);
+        for (int i = 0; i < mBoardSize; i++) {
+            if (i % squareSize == 0) res.append(" -----------------------").append("\n");
+            for (int j = 0; j < mBoardSize; j++) {
+                if (j % squareSize == 0) res.append("| ");
+                res.append(mBoard[i][j] != 0 ? (mBoard[i][j]) : "-");
+                res.append(' ');
+            }
+            res.append("|").append("\n");
+        }
+        res.append(" -----------------------").append("\n");
+        return res.toString();
+    }
 
 }

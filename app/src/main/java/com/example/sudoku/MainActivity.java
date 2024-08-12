@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
         button4x4.setOnClickListener(view -> selectBoardSize(16));
         button5x5.setOnClickListener(view -> selectBoardSize(25));
 
-        buttonEasy.setOnClickListener(view ->selectDifficult("easy"));
-        buttonMedium.setOnClickListener(view ->selectDifficult("medium"));
-        buttonHard.setOnClickListener(view ->selectDifficult("hard"));
+        buttonEasy.setOnClickListener(view -> selectDifficult("easy"));
+        buttonMedium.setOnClickListener(view -> selectDifficult("medium"));
+        buttonHard.setOnClickListener(view -> selectDifficult("hard"));
 
         starting_button.setOnClickListener(view -> nextActivity(view));
     }

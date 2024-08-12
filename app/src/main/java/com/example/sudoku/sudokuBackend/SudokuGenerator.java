@@ -6,7 +6,7 @@ import java.util.function.IntBinaryOperator;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-public class SudokuGenerator {
+public class SudokuGenerator implements SudokuTemplate {
     protected static int mBoardSize;
     protected static int mSquareSize;
     protected String difficulty;
@@ -58,8 +58,13 @@ public class SudokuGenerator {
         return board;
     }
 
+    @Override
     public int getBoard(int i, int j) {
         return mBoard[i][j];
+    }
+
+    @Override
+    public void getShuffle() {
     }
 
     private static ArrayList<Integer> getRandomList(int boardSize) {
