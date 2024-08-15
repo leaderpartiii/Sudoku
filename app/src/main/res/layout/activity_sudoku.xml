@@ -8,6 +8,27 @@
     android:background="@color/pink"
     tools:context=".SudokuActivity">
 
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/numberBar"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
     <Button
         android:id="@+id/buttonReset"
         android:layout_width="wrap_content"
@@ -17,20 +38,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/numberBar"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="56dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.48"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <com.example.sudoku.layout.SquareGridLayout
         android:id="@+id/square_grid_layout"
@@ -49,5 +56,40 @@
 
     </com.example.sudoku.layout.SquareGridLayout>
 
+    <Button
+        android:id="@+id/buttonHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/textHint"
+        app:layout_constraintBottom_toTopOf="@+id/square_grid_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textMistake"
+        app:layout_constraintTop_toBottomOf="@+id/buttonReset" />
+
+    <TextView
+        android:id="@+id/textMistake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/textNumberOfMistakes"
+        app:layout_constraintBottom_toTopOf="@+id/square_grid_layout"
+        app:layout_constraintEnd_toStartOf="@+id/buttonHint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonReset" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/fireworks" />
+
+<!--    <com.airbnb.lottie.LottieAnimationView-->
+<!--        android:id="@+id/lottieViewRaining"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:lottie_autoPlay="false"-->
+<!--        app:lottie_loop="false"-->
+<!--        app:lottie_rawRes="@raw/raining" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

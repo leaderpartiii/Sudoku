@@ -30,7 +30,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
 dependencies {
 
     implementation(libs.appcompat)
@@ -41,4 +40,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    implementation ("com.airbnb.android:lottie:5.0.3")
+
 }
