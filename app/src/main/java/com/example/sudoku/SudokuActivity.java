@@ -80,13 +80,16 @@ public class SudokuActivity extends AppCompatActivity {
     private void generateBoard() {
         createTable();
         createNumberBar();
-        createTextMistakes(COUNT_MISTAKES);
+        createTextMistakes();
         createHintButton();
     }
 
-    private void createTextMistakes(int mistakes) {
+    private void createTextMistakes() {
         TextView textMistake = findViewById(R.id.textMistake);
-        textMistake.setText("Ошибки " + mistakes + "/" + 3);
+        textMistake.setText("Ошибки " + COUNT_MISTAKES + "/" + 3);
+        if (COUNT_MISTAKES == 3) {
+            startAnimation(R.raw.raining, 2.5f, getAlertDialog("Игра окончена", "Вы проиграли. Хотите начать заново?"));
+        }
     }
 
     private void createHintButton() {
@@ -146,16 +149,16 @@ public class SudokuActivity extends AppCompatActivity {
             params.rowSpec = GridLayout.spec(col, 1, 1f);
             params.columnSpec = GridLayout.spec(row, 1, 1f);
 
-            int norm = 5;
-            int space = 15;
+            int temp = 3;
+            int space = temp*3;
 
             if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1)
-                params.setMargins(norm, norm, space, space);
+                params.setMargins(temp, temp, space, space);
             else if (row % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1)
-                params.setMargins(norm, norm, space, norm);
+                params.setMargins(temp, temp, space, temp);
             else if (row % SQUARE_GRID_SIZE != SQUARE_GRID_SIZE - 1 && col % SQUARE_GRID_SIZE == SQUARE_GRID_SIZE - 1)
-                params.setMargins(norm, norm, norm, space);
-            else params.setMargins(norm, norm, norm, norm);
+                params.setMargins(temp, temp, temp, space);
+            else params.setMargins(temp, temp, temp, temp);
             grid_layout.addView(cell, params);
         }
     }
@@ -217,10 +220,8 @@ public class SudokuActivity extends AppCompatActivity {
             text.setTextColor(incorrectColor);
 
             COUNT_MISTAKES++;
-            createTextMistakes(COUNT_MISTAKES);
-            if (COUNT_MISTAKES == 3) {
-                startAnimation(R.raw.raining, 2.5f, getAlertDialog("Игра окончена", "Вы проиграли. Хотите начать заново?"));
-            }
+            createTextMistakes();
+
         }
     }
 
@@ -322,7 +323,7 @@ public class SudokuActivity extends AppCompatActivity {
             case (16):
                 return 10;
             case (25):
-                return 4;
+                return 8;
             default:
                 return 0;
         }
