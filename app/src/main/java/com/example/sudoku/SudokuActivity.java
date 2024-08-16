@@ -33,6 +33,8 @@ public class SudokuActivity extends AppCompatActivity {
     private int pressedBackgroundColor;
     private int highlightedBackgroundColor;
     private int defaultBackgroundColor;
+    private boolean hint;
+    private int COUNT_HINTS = 3;
     private int[][] SUDOKU_PROBLEM;
     private String DIFFICULT;
     private int[] NUMBERS_ON_NUMBER_BAR;
@@ -46,17 +48,18 @@ public class SudokuActivity extends AppCompatActivity {
         GRID_SIZE = getIntent().getIntExtra("BOARD_SIZE", 9);
         SQUARE_GRID_SIZE = (int) Math.sqrt(GRID_SIZE);
 
+        setColors();
+        generateButtonReset();
+        generateBoard();
+    }
+
+    private void setColors() {
         pressedBackgroundColor = getResources().getColor(R.color.light_gray, getTheme());
         incorrectColor = getResources().getColor(R.color.red, getTheme());
         defaultColor = getResources().getColor(R.color.black, getTheme());
         highlightedBackgroundColor = R.color.blue_light;
         defaultBackgroundColor = android.R.color.background_light;
-
-        generateButtonReset();
-        generateBoard();
-
     }
-
 
     private void generateButtonReset() {
         Button resetButton = findViewById(R.id.buttonReset);
@@ -77,12 +80,22 @@ public class SudokuActivity extends AppCompatActivity {
     private void generateBoard() {
         createTable();
         createNumberBar();
-        generateTextMistakes(COUNT_MISTAKES);
+        createTextMistakes(COUNT_MISTAKES);
+        createHintButton();
     }
 
-    private void generateTextMistakes(int mistakes) {
+    private void createTextMistakes(int mistakes) {
         TextView textMistake = findViewById(R.id.textMistake);
-        textMistake.setText("Число ошибок " + mistakes + "/" + 3);
+        textMistake.setText("Ошибки " + mistakes + "/" + 3);
+    }
+
+    private void createHintButton() {
+        Button buttonHint = findViewById(R.id.buttonHint);
+        buttonHint.setOnClickListener(view -> hint = !hint);
+        buttonHint.setText("Подсказки " + COUNT_HINTS + "/" + "3");
+        if (COUNT_HINTS == 0) {
+            buttonHint.setEnabled(false);
+        }
     }
 
     public void createTable() {
@@ -94,6 +107,7 @@ public class SudokuActivity extends AppCompatActivity {
             sudokuDecision.getShuffle();
         }
 
+        hint = false;
         COUNT_TASKS = sudokuDecision.getNumberTasks();
         COUNT_MISTAKES = 0;
         SELECTED_NUMBER = -1;
@@ -118,7 +132,13 @@ public class SudokuActivity extends AppCompatActivity {
 
             int finalI = i;
 
-            cell.setOnClickListener(v -> showMessage(numDecisionBoard, finalI));
+            cell.setOnClickListener(v -> {
+                if (hint) {
+                    showButton(numDecisionBoard, finalI);
+                } else {
+                    clickTable(numDecisionBoard, finalI);
+                }
+            });
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             int buttonSize = 13;
             params.width = buttonSize;
@@ -140,7 +160,46 @@ public class SudokuActivity extends AppCompatActivity {
         }
     }
 
-    public void showMessage(int correctNumber, int index) {
+    private void clickOnTheCorrectButton(boolean userClick, int index, TextView text, int correctNumber) {
+
+        SUDOKU_PROBLEM[index / GRID_SIZE][index % GRID_SIZE] = correctNumber;
+
+        text.setText(String.valueOf(correctNumber));
+        text.setTextColor(defaultColor);
+
+        if (userClick) {
+            text.setBackgroundColor(pressedBackgroundColor);
+        }
+
+        if (NUMBERS_ON_NUMBER_BAR[correctNumber - 1] == GRID_SIZE - 1) {
+            LinearLayout linearLayout = findViewById(R.id.numberBar);
+            TextView button = (TextView) linearLayout.getChildAt(correctNumber - 1);
+            button.setText("");
+        } else {
+            NUMBERS_ON_NUMBER_BAR[correctNumber - 1]++;
+        }
+        COUNT_TASKS--;
+        if (COUNT_TASKS == 0) {
+            startAnimation(R.raw.fireworks, 1.0f, getAlertDialog("Игра окончена", "Вы выиграли. Хотите начать заново?"));
+        }
+    }
+
+    private void showButton(int correctNumber, int index) {
+        SquareGridLayout layout = findViewById(R.id.square_grid_layout);
+        TextView text = (TextView) layout.getChildAt(index);
+
+        if (text.getText().toString().equals("-")) {
+
+            hint = false;
+            COUNT_HINTS--;
+            createHintButton();
+
+            clickOnTheCorrectButton(false, index, text, correctNumber);
+        }
+    }
+
+    private void clickTable(int correctNumber, int index) {
+
         SquareGridLayout layout = findViewById(R.id.square_grid_layout);
         TextView text = (TextView) layout.getChildAt(index);
 
@@ -152,49 +211,32 @@ public class SudokuActivity extends AppCompatActivity {
             return;
         }
         if (correctNumber == SELECTED_NUMBER) {
-
-            SUDOKU_PROBLEM[index / GRID_SIZE][index % GRID_SIZE] = SELECTED_NUMBER;
-
-            text.setText(String.valueOf(SELECTED_NUMBER));
-            text.setTextColor(defaultColor);
-            text.setBackgroundColor(pressedBackgroundColor);
-
-            if (NUMBERS_ON_NUMBER_BAR[correctNumber - 1] == GRID_SIZE - 1) {
-                LinearLayout linearLayout = findViewById(R.id.numberBar);
-                TextView button = (TextView) linearLayout.getChildAt(correctNumber - 1);
-                button.setText("");
-            } else {
-                NUMBERS_ON_NUMBER_BAR[correctNumber - 1]++;
-            }
-            COUNT_TASKS--;
-            if (COUNT_TASKS == 0) {
-                startAnimation(R.raw.fireworks, 1.0f, getAlertDialog("Игра окончена", "Вы выиграли. Хотите начать заново?"));
-            }
-
+            clickOnTheCorrectButton(true, index, text, correctNumber);
         } else {
             text.setText(String.valueOf(SELECTED_NUMBER));
             text.setTextColor(incorrectColor);
 
             COUNT_MISTAKES++;
-            generateTextMistakes(COUNT_MISTAKES);
+            createTextMistakes(COUNT_MISTAKES);
             if (COUNT_MISTAKES == 3) {
                 startAnimation(R.raw.raining, 2.5f, getAlertDialog("Игра окончена", "Вы проиграли. Хотите начать заново?"));
             }
         }
     }
 
-    private void setAllEnabled(){
+    private void setAllEnabled() {
         SquareGridLayout gridLayout = findViewById(R.id.square_grid_layout);
-        for (int i = 0; i < GRID_SIZE*GRID_SIZE; i++) {
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
             TextView button = (TextView) gridLayout.getChildAt(i);
             button.setEnabled(false);
         }
-        LinearLayout layout =  findViewById(R.id.numberBar);
+        LinearLayout layout = findViewById(R.id.numberBar);
         for (int i = 0; i < GRID_SIZE; i++) {
             Button button = (Button) layout.getChildAt(i);
             button.setEnabled(false);
         }
-    };
+    }
+
     private void startAnimation(int animationCode, float speed, AlertDialog dialog) {
         setAllEnabled();
         LottieAnimationView lottieView = findViewById(R.id.lottieView);
